@@ -1,164 +1,165 @@
-# Virtual Personal Assistant for Accessibility (Using Generative AI)
+# Context-Aware Virtual Assistant for Simplified Digital Content
 
 ## 📌 Project Overview
-This project is a **software-based accessibility assistant** designed to help people with disabilities interact with smartphones or computers using **voice and intelligent context awareness**.
 
-Unlike general-purpose assistants (Alexa, Siri, Google Assistant), this system focuses on **accessibility-first interaction**, not convenience.  
-It acts as an **accessibility layer** between the user and the device, enabling inclusive and secure digital access.
+READ-EASE is a software-based, context-aware virtual assistant designed to improve digital accessibility by simplifying and explaining complex digital text content.
 
----
+Unlike general-purpose virtual assistants that require explicit commands, READ-EASE focuses on proactive assistance. It observes user interaction patterns and offers help when the user appears confused or inactive.
+
+The system is built as an accessibility-first solution, aimed at supporting users who struggle with reading or understanding digital content, including visually impaired users, students, and elderly individuals.
+
 
 ## 🎯 Problem Statement
-Many people with disabilities face difficulties while using digital devices:
+Digital platforms contain large volumes of text written in complex language. Many users face challenges such as:
 
-- Visually impaired users cannot read screen content or locate buttons.
-- Motor-impaired users cannot interact with touch-based interfaces.
-- Existing voice assistants:
-  - Require explicit commands
-  - Are not context-aware
-  - Do not adapt based on disability
-  - Prioritize convenience over accessibility
+ -Difficulty understanding long or technical text
+ - Visual impairment limiting screen readability
+ - Cognitive overload while reading digital content
+ - Dependence on explicit commands in existing assistants
 
-This creates a **digital accessibility gap**.
+Current virtual assistants:
+ - Require precise user commands
+ - Do not detect user confusion or inactivity
+ - Do not proactively simplify content
+ - Prioritize convenience over accessibility
 
----
+This creates a digital accessibility gap, especially for users who need assistance but may not know how or when to ask for it.
+
 
 ## 💡 Proposed Solution
-We propose a **Context-Aware Virtual Personal Assistant** powered by **Generative AI**, which:
+READ-EASE addresses this gap by introducing context-aware assistance.
 
-- Understands the **user’s situation**
-- Automatically offers help when needed
-- Communicates using voice or simplified text
-- Maintains **privacy and security**
+The system:
+ - Detects user inactivity while viewing digital text
+ - Proactively offers help when confusion is likely
+ - Simplifies text using Generative AI
+ - Delivers explanations through voice and text
+ - Ensures user consent and ethical AI usage
 
-The assistant does **not replace** existing assistants, but **enhances accessibility** where they fail.
+The assistant does not automate device actions or replace user control. It acts as a support layer that enhances understanding.
 
----
 
 ## 🧠 Key Idea
-> We are not building a better AI than ChatGPT.  
-> We are building a **better interaction system around AI**.
+The intelligence of READ-EASE lies not only in AI, but in how AI is used.
 
-Generative AI (like GPT) is used as the **intelligence engine**, while our software handles:
-- When to speak
-- What to speak
-- How to speak
-- What level of access is allowed
+Generative AI is integrated as an on-demand explanation engine, while the system logic determines:
+ - When assistance should be offered
+ - Whether the user has given consent
+ - How simple the explanation should be
+AI is invoked only after context validation and user confirmation.
 
----
+This design ensures responsible and user-centric AI usage.
+
 
 ## 👥 Target Users
-This prototype primarily focuses on:
 
-### ✅ Visually Impaired Users
-- Cannot see screen content
-- Need audio-based navigation and explanation
+✅ Supported Users
 
-### ⚠️ Motor-Impaired Users (Limited Scope)
-- Can speak but cannot use touch input
-- Supported only for limited system actions
+ - Visually impaired users who need audio-based explanations
+ - Students reading complex academic content
+ - Elderly users facing difficulty understanding digital text
+ - General users seeking simplified explanations
 
-> Note: The system requires at least **one functional input (voice)** and **one output (audio or text)**.
+❌ Out of Scope Users
 
----
+ - Deaf-blind users (no supported input/output channel)
+ - Users without any form of input (voice or text)
+ - Users requiring specialized hardware (Braille, haptics, eye-tracking)
 
-## ❌ Out of Scope Users
-The prototype **does not support**:
-- Deaf-blind users (no audio or visual output possible)
-- Users who cannot speak or provide any input
-- Severe cognitive impairment cases
+These cases require dedicated assistive hardware and are beyond the scope of this software prototype.
 
-These cases require specialized hardware (Braille, haptics, eye-tracking).
-
----
 
 ## ⚙️ How the System Works (Working Flow)
 
-1. User interacts via **voice**
-2. Speech is converted to text (Speech-to-Text)
-3. Context logic analyzes:
-   - Screen state
-   - User inactivity
-   - App being used
-4. Generative AI:
-   - Explains content
-   - Summarizes text
-   - Generates responses
-5. Output is delivered via **Text-to-Speech**
-6. System confirms sensitive actions before execution
+1. User opens or provides digital text content
+2. System monitors user interaction
+3. If inactivity is detected:
+   - Assistant offers help
+4. On user consent:
+   - Text is sent to the AI engine
+5. AI generates a simplified explanation
+6. Output is delivered as:
+   - On-screen text
+   - Voice output using Text-to-Speech
+All assistance is user-initiated or user-approved.
 
----
 
-## 🔐 Privacy & Security Design
-To avoid misuse, the system uses **layered security**:
+## 🔐 Privacy & Ethical Design
+READ-EASE is designed with privacy and ethics as core principles:
 
-- Wake-word based activation
-- Voice-based user recognition (conceptual)
-- Command-level permissions
-- Confirmation for sensitive actions
-- Restricted mode in public environments
+ - No background monitoring
+ - No permanent storage of user data
+ - Consent-based AI invocation
+ - Temporary session-level processing
+ - No autonomous or hidden actions
+ - 
+User control is always prioritized over automation.
 
-Accessibility is provided **without compromising privacy**.
 
----
+## 🧩 Key Features
 
-## 🧩 Features
-- Voice-based navigation
-- Screen content reading and summarization
-- Context-aware auto assistance
-- Simplified language explanations
-- Hands-free interaction
-- Privacy-aware command execution
+ - Context-aware assistance based on inactivity
+ - Voice-based user interaction
+ - Simplified text explanation using Generative AI
+ - Text-to-Speech output for accessibility
+ - Minimal and accessible user interface
+ - Ethical and privacy-aware AI usage
 
----
 
 ## 🛠️ Technology Stack (Conceptual)
-- Generative AI (LLM)
-- Speech-to-Text
-- Text-to-Speech
-- Accessibility APIs
-- Context logic engine
-- Web / Desktop / Mobile interface
 
-> Hardware is **not required**. Existing device microphone and speaker are used.
+ - Frontend: HTML, CSS, JavaScript
+ - Backend: Python (Flask)
+ - AI Engine: Generative AI (API-based)
+ - Speech-to-Text: Browser Speech API
+ - Text-to-Speech: Web Speech API
+ - Deployment: Web-based (Cloud-hosted)
+  
+No additional hardware is required. The system uses existing device microphones and speakers.
 
----
 
 ## 📉 Limitations
-- Requires user voice input
-- Limited system-level control due to OS restrictions
-- Not suitable for users lacking both input and output channels
 
-These limitations are acknowledged as part of ethical and realistic system design.
+ - Requires internet connectivity
+ - Depends on voice input for interaction
+ - Limited by browser and OS security permissions
+ - Not suitable for users without any input/output channel
+  
+These limitations are acknowledged as part of responsible and realistic system design.
 
----
 
 ## 🔮 Future Scope
-- Hardware integration (Braille display, haptic feedback)
-- Wearable accessibility devices
-- Multi-language and regional accent support
-- Caregiver-assisted mode
-- Eye-tracking based input
 
----
+ - Multilingual support
+ - Adjustable explanation levels
+ - Integration with screen readers
+ - Support for additional accessibility hardware
+ - Offline text simplification models
+ - Caregiver-assisted mode
+
 
 ## 🧪 Project Type
-- Software-only prototype
-- Academic / Final-Year Project
-- Accessibility-focused AI application
+ - Software-only prototype
+ - Academic / B.Tech Project
+ - Accessibility-focused AI application
 
----
 
 ## 🏁 Conclusion
-This project demonstrates how **Generative AI can be responsibly used** to improve digital accessibility.  
-By focusing on **context, inclusivity, and privacy**, it addresses real-world problems that existing assistants do not fully solve.
 
----
+READ-EASE demonstrates how Generative AI can be responsibly integrated to enhance digital accessibility. By focusing on context awareness, user consent, and simplicity, the project provides meaningful assistance without compromising privacy or control.
 
-## 📄 License
-This project is developed for academic and research purposes.
+The system highlights that impactful AI solutions are built not only by advanced models, but by thoughtful system design around them.
 
-Made By:
-1. Mahi Srivastava
-2. Suneeti Rana
-3. Rachit Saxena
+
+📄 License
+
+This project is developed strictly for academic and research purposes.
+
+
+## 👩‍💻 Team Members
+
+Mahi Srivastava
+Frontend Development, AI Integration & Documentation
+
+Suneeti Rana
+Backend Development & Viva Defense
