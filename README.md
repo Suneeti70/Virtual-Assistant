@@ -153,13 +153,14 @@ The system highlights that impactful AI solutions are built not only by advanced
 
 📄 License
 
-This project is developed strictly for academic and research purposes.
+This project is developed for academic and research purposes.
 
 
 ## 👩‍💻 Team Members
 
-Mahi Srivastava
+Mahi Srivastava-
 Frontend Development, AI Integration & Documentation
 
-Suneeti Rana
+Suneeti Rana-
 Backend Development & Viva Defense
+
