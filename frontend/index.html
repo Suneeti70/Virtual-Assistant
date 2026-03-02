@@ -1,27 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>READ-EASE</title>
+    <title>Read Ease - Virtual Assistant</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="container">
-        <h1>READ-EASE</h1>
-        <p>Simplify complex digital content easily.</p>
+<div class="container">
 
-        <textarea id="inputText" placeholder="Paste your text here..."></textarea>
-
-        <button id="simplifyBtn">Simplify Text</button>
-        <button id="speakBtn">🔊 Speak Output</button>
-
-        <div id="outputBox">
-            <h3>Simplified Output:</h3>
-            <p id="outputText"></p>
+    <div class="header">
+        <div>
+            <h1>Read Ease</h1>
+            <h3 class="subheading">AI Virtual Assistant</h3>
         </div>
+        <button onclick="toggleDarkMode()">🌙</button>
     </div>
 
-    <script src="script.js"></script>
+    <p class="tagline">Your smart assistant for summarizing, explaining, and refining text.</p>
+
+    <!-- Mode Selection -->
+    <div class="mode-selector">
+        <select id="mode">
+            <option value="summarize">Summarize</option>
+            <option value="explain">Explain</option>
+            <option value="improve">Improve Writing</option>
+            <option value="translate">Translate to Simple English</option>
+        </select>
+    </div>
+
+    <textarea id="inputText" 
+        placeholder="Type or paste your text here..."
+        maxlength="2000"
+        oninput="updateCount(); autoResize(this)">
+    </textarea>
+
+    <div class="info-bar">
+        <span id="charCount">Characters: 0 / 2000</span>
+        <span id="wordCount">Words: 0</span>
+    </div>
+
+    <div class="button-group">
+        <button id="actionBtn" onclick="processText()">Generate</button>
+        <button onclick="clearAll()">Clear</button>
+        <button onclick="copyResponse()">Copy</button>
+        <button onclick="downloadResponse()">Download</button>
+    </div>
+
+    <div id="loader" class="thinking hidden">Assistant is thinking<span id="dots">.</span></div>
+
+    <div id="output" class="output-box">
+        Assistant response will appear here...
+    </div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
