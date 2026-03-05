@@ -7,20 +7,22 @@ CORS(app)
 
 summarizer = pipeline("text-generation", model="gpt2")
 
-@app.route("/")
-def home():
-    return "AI Assistant Backend Running"
-
 @app.route("/summarize", methods=["POST"])
 def summarize():
     data = request.json
     text = data.get("text", "")
 
-    prompt = f"Summarize this text in simple language:\n{text}"
+    prompt = f"Summarize this text in simple language:\n{text}\nSummary:"
 
-    result = summarizer(prompt, max_length=150)
+    result = summarizer(
+        prompt,
+        max_length=120,
+        do_sample=False
+    )
 
-    summary = result[0]["generated_text"]
+    generated = result[0]["generated_text"]
+
+    summary = generated.split("Summary:")[-1].strip()
 
     return jsonify({"summary": summary})
 
