@@ -35,7 +35,7 @@
     <!-- INPUT TEXT -->
     <textarea
         id="inputText"
-        placeholder="Type or paste your text here..."
+        placeholder="Type, paste, or speak your text here..."
         maxlength="2000"
         oninput="updateCount(); autoResize(this)">
     </textarea>
@@ -50,6 +50,8 @@
 
         <button onclick="processText()">Generate</button>
 
+        <button onclick="startVoice()">🎤 Speak</button>
+
         <button onclick="clearAll()">Clear</button>
 
         <button onclick="copyResponse()">Copy</button>
@@ -58,10 +60,12 @@
 
     </div>
 
+    <!-- LOADER -->
     <div id="loader" class="thinking hidden">
         Assistant is thinking<span id="dots">.</span>
     </div>
 
+    <!-- OUTPUT -->
     <div id="output" class="output-box">
         Assistant response will appear here...
     </div>
