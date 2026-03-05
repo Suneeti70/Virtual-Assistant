@@ -5,54 +5,67 @@ from transformers import pipeline
 app = Flask(__name__)
 CORS(app)
 
-# Load AI model
-generator = pipeline("text-generation", model="gpt2")
+# Real summarization model
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
 
 @app.route("/process", methods=["POST"])
 def process_text():
 
     data = request.get_json()
-
     text = data.get("text", "")
     mode = data.get("mode", "summarize")
 
     if text.strip() == "":
-        return jsonify({"result": "Please enter some text first."})
+        return jsonify({"result": "Please enter some text."})
 
-    # Different AI prompts for different modes
     if mode == "summarize":
-        prompt = f"Summarize the following text in simple language:\n{text}"
+
+        result = summarizer(
+            text,
+            max_length=120,
+            min_length=30,
+            do_sample=False
+        )
+
+        output = result[0]["summary_text"]
 
     elif mode == "explain":
-        prompt = f"Explain the following text in very simple terms:\n{text}"
+
+        prompt = f"Explain this text simply:\n{text}"
+
+        generator = pipeline("text-generation", model="gpt2")
+        result = generator(prompt, max_length=200)
+
+        output = result[0]["generated_text"]
 
     elif mode == "improve":
-        prompt = f"Improve the writing and clarity of this text:\n{text}"
+
+        prompt = f"Improve the writing of this text:\n{text}"
+
+        generator = pipeline("text-generation", model="gpt2")
+        result = generator(prompt, max_length=200)
+
+        output = result[0]["generated_text"]
 
     elif mode == "translate":
-        prompt = f"Rewrite the following text in very simple English:\n{text}"
+
+        prompt = f"Rewrite this in simple English:\n{text}"
+
+        generator = pipeline("text-generation", model="gpt2")
+        result = generator(prompt, max_length=200)
+
+        output = result[0]["generated_text"]
 
     else:
-        prompt = text
+        output = "Invalid mode."
 
-    # Generate AI response
-    result = generator(
-        prompt,
-        max_length=200,
-        num_return_sequences=1
-    )
-
-    output = result[0]["generated_text"]
-
-    return jsonify({
-        "result": output
-    })
+    return jsonify({"result": output})
 
 
 @app.route("/")
 def home():
-    return "ReadEase AI Backend Running"
+    return "ReadEase Backend Running"
 
 
 if __name__ == "__main__":
