@@ -6,7 +6,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Load AI summarizer model
-summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+summarizer = pipeline("text-generation", model="google/flan-t5-base")
 
 @app.route("/summarize", methods=["POST"])
 def summarize():
