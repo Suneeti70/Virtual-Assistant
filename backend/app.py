@@ -7,6 +7,10 @@ CORS(app)
 
 summarizer = pipeline("text-generation", model="gpt2")
 
+@app.route("/")
+def home():
+    return "AI Assistant Backend Running"
+
 @app.route("/summarize", methods=["POST"])
 def summarize():
     data = request.json
