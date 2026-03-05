@@ -20,7 +20,6 @@ function updateCount() {
 }
 
 
-
 // AUTO RESIZE TEXTAREA
 function autoResize(element) {
 
@@ -30,7 +29,6 @@ function autoResize(element) {
 }
 
 
-
 // MAIN AI PROCESS FUNCTION
 async function processText() {
 
@@ -38,10 +36,8 @@ async function processText() {
     const selectedMode = mode.value;
 
     if(text === ""){
-
         alert("Please enter text first.");
         return;
-
     }
 
     loader.classList.remove("hidden");
@@ -80,6 +76,46 @@ async function processText() {
 }
 
 
+// VOICE INPUT FUNCTION
+function startVoice(){
+
+    if(!('webkitSpeechRecognition' in window)){
+        alert("Speech recognition not supported in this browser.");
+        return;
+    }
+
+    const recognition = new webkitSpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.start();
+
+    recognition.onstart = function(){
+        output.innerText = "🎤 Listening... Speak now.";
+    };
+
+    recognition.onresult = function(event){
+
+        const transcript = event.results[0][0].transcript;
+
+        inputText.value = transcript;
+
+        updateCount();
+        autoResize(inputText);
+
+        output.innerText = "Voice captured. Click Generate.";
+
+    };
+
+    recognition.onerror = function(event){
+        console.error("Speech recognition error:", event.error);
+        output.innerText = "Voice recognition error.";
+    };
+
+}
+
 
 // CLEAR BUTTON
 function clearAll(){
@@ -90,7 +126,6 @@ function clearAll(){
     updateCount();
 
 }
-
 
 
 // COPY BUTTON
@@ -108,7 +143,6 @@ function copyResponse(){
     alert("Copied to clipboard.");
 
 }
-
 
 
 // DOWNLOAD BUTTON
@@ -134,14 +168,12 @@ function downloadResponse(){
 }
 
 
-
 // DARK MODE
 function toggleDarkMode(){
 
     document.body.classList.toggle("dark");
 
 }
-
 
 
 // LOADER ANIMATION
@@ -154,7 +186,6 @@ setInterval(()=>{
     }
 
 },500);
-
 
 
 // INITIAL COUNT
