@@ -1,14 +1,12 @@
 const inputText = document.getElementById("inputText");
-const outputText = document.getElementById("outputText");
+const outputBox = document.getElementById("output");
+const modeSelect = document.getElementById("mode");
 
-const summarizeBtn = document.getElementById("summarizeBtn");
-const clearBtn = document.getElementById("clearBtn");
-const copyBtn = document.getElementById("copyBtn");
-const downloadBtn = document.getElementById("downloadBtn");
+const loader = document.getElementById("loader");
 
 
-// SUMMARIZE BUTTON
-summarizeBtn.addEventListener("click", async () => {
+// MAIN AI FUNCTION
+async function processText() {
 
     const text = inputText.value.trim();
 
@@ -17,79 +15,125 @@ summarizeBtn.addEventListener("click", async () => {
         return;
     }
 
-    outputText.value = "Processing...";
+    loader.classList.remove("hidden");
+    outputBox.innerText = "";
 
     try{
 
-        const response = await fetch("http://127.0.0.1:5000/summarize", {
-            method: "POST",
+        const response = await fetch("http://127.0.0.1:5000/summarize",{
+
+            method:"POST",
+
             headers:{
                 "Content-Type":"application/json"
             },
+
             body: JSON.stringify({
-                text:text
+                text:text,
+                mode:modeSelect.value
             })
+
         });
 
         const data = await response.json();
 
-        outputText.value = data.summary;
+        outputBox.innerText = data.summary;
 
     }
+
     catch(error){
 
-        outputText.value = "Error connecting to AI server.";
+        outputBox.innerText = "Error connecting to AI server.";
 
         console.error(error);
 
     }
 
-});
+    loader.classList.add("hidden");
+
+}
 
 
 
-// CLEAR BUTTON
-clearBtn.addEventListener("click", () => {
+function clearAll(){
 
     inputText.value = "";
-    outputText.value = "";
+    outputBox.innerText = "";
 
-});
+    updateCount();
+
+}
 
 
 
-// COPY BUTTON
-copyBtn.addEventListener("click", () => {
+function copyResponse(){
 
-    if(outputText.value === ""){
+    const text = outputBox.innerText;
+
+    if(text === ""){
         alert("Nothing to copy.");
         return;
     }
 
-    navigator.clipboard.writeText(outputText.value);
+    navigator.clipboard.writeText(text);
 
-    alert("Summary copied to clipboard.");
+    alert("Response copied.");
 
-});
+}
 
 
 
-// DOWNLOAD BUTTON
-downloadBtn.addEventListener("click", () => {
+function downloadResponse(){
 
-    if(outputText.value === ""){
+    const text = outputBox.innerText;
+
+    if(text === ""){
         alert("Nothing to download.");
         return;
     }
 
-    const blob = new Blob([outputText.value], {type:"text/plain"});
+    const blob = new Blob([text],{type:"text/plain"});
 
     const link = document.createElement("a");
 
     link.href = URL.createObjectURL(blob);
 
-    link.download = "summary.txt";
+    link.download = "response.txt";
 
     link.click();
 
-});
+}
+
+
+
+function updateCount(){
+
+    const text = inputText.value;
+
+    document.getElementById("charCount").innerText =
+        "Characters: " + text.length + " / 2000";
+
+    const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+
+    document.getElementById("wordCount").innerText =
+        "Words: " + words.length;
+
+}
+
+
+
+function autoResize(textarea){
+
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+
+}
+
+
+
+// DARK MODE
+function toggleDarkMode(){
+
+    document.body.classList.toggle("dark");
+
+}
