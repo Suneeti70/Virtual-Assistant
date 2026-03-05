@@ -1,50 +1,76 @@
 const inputText = document.getElementById("inputText");
-const outputBox = document.getElementById("output");
-const modeSelect = document.getElementById("mode");
-
+const output = document.getElementById("output");
+const mode = document.getElementById("mode");
 const loader = document.getElementById("loader");
+const charCount = document.getElementById("charCount");
+const wordCount = document.getElementById("wordCount");
 
 
-// MAIN AI FUNCTION
+// CHARACTER + WORD COUNTER
+function updateCount() {
+
+    const text = inputText.value;
+
+    charCount.innerText = "Characters: " + text.length + " / 2000";
+
+    const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+
+    wordCount.innerText = "Words: " + words;
+
+}
+
+
+
+// AUTO RESIZE TEXTAREA
+function autoResize(element) {
+
+    element.style.height = "auto";
+    element.style.height = element.scrollHeight + "px";
+
+}
+
+
+
+// MAIN AI PROCESS FUNCTION
 async function processText() {
 
     const text = inputText.value.trim();
+    const selectedMode = mode.value;
 
     if(text === ""){
+
         alert("Please enter text first.");
         return;
+
     }
 
     loader.classList.remove("hidden");
-    outputBox.innerText = "";
+    output.innerText = "";
 
     try{
 
-        const response = await fetch("http://127.0.0.1:5000/summarize",{
+        const response = await fetch("http://127.0.0.1:5000/process",{
 
             method:"POST",
-
             headers:{
                 "Content-Type":"application/json"
             },
 
-            body: JSON.stringify({
+            body:JSON.stringify({
                 text:text,
-                mode:modeSelect.value
+                mode:selectedMode
             })
 
         });
 
         const data = await response.json();
 
-        outputBox.innerText = data.summary;
+        output.innerText = data.result;
 
     }
-
     catch(error){
 
-        outputBox.innerText = "Error connecting to AI server.";
-
+        output.innerText = "Error connecting to AI server.";
         console.error(error);
 
     }
@@ -55,10 +81,11 @@ async function processText() {
 
 
 
+// CLEAR BUTTON
 function clearAll(){
 
     inputText.value = "";
-    outputBox.innerText = "";
+    output.innerText = "Assistant response will appear here...";
 
     updateCount();
 
@@ -66,28 +93,30 @@ function clearAll(){
 
 
 
+// COPY BUTTON
 function copyResponse(){
 
-    const text = outputBox.innerText;
+    const text = output.innerText;
 
-    if(text === ""){
+    if(text === "" || text === "Assistant response will appear here..."){
         alert("Nothing to copy.");
         return;
     }
 
     navigator.clipboard.writeText(text);
 
-    alert("Response copied.");
+    alert("Copied to clipboard.");
 
 }
 
 
 
+// DOWNLOAD BUTTON
 function downloadResponse(){
 
-    const text = outputBox.innerText;
+    const text = output.innerText;
 
-    if(text === ""){
+    if(text === "" || text === "Assistant response will appear here..."){
         alert("Nothing to download.");
         return;
     }
@@ -98,34 +127,9 @@ function downloadResponse(){
 
     link.href = URL.createObjectURL(blob);
 
-    link.download = "response.txt";
+    link.download = "assistant_response.txt";
 
     link.click();
-
-}
-
-
-
-function updateCount(){
-
-    const text = inputText.value;
-
-    document.getElementById("charCount").innerText =
-        "Characters: " + text.length + " / 2000";
-
-    const words = text.trim().split(/\s+/).filter(word => word.length > 0);
-
-    document.getElementById("wordCount").innerText =
-        "Words: " + words.length;
-
-}
-
-
-
-function autoResize(textarea){
-
-    textarea.style.height = "auto";
-    textarea.style.height = textarea.scrollHeight + "px";
 
 }
 
@@ -137,3 +141,21 @@ function toggleDarkMode(){
     document.body.classList.toggle("dark");
 
 }
+
+
+
+// LOADER ANIMATION
+let dots = document.getElementById("dots");
+
+setInterval(()=>{
+
+    if(dots){
+        dots.innerText = dots.innerText.length >= 3 ? "." : dots.innerText + ".";
+    }
+
+},500);
+
+
+
+// INITIAL COUNT
+updateCount();
