@@ -11,16 +11,15 @@ summarizer = pipeline("text-generation", model="google/flan-t5-base")
 @app.route("/summarize", methods=["POST"])
 def summarize():
     data = request.json
-    text = data.get("text")
+    text = data.get("text", "")
 
-    if not text:
-        return jsonify({"summary": "No input provided"})
+    prompt = f"Summarize this text in simple language:\n{text}"
 
-    result = summarizer(text, max_length=130, min_length=30, do_sample=False)
+    result = summarizer(prompt, max_length=150, do_sample=False)
 
-    return jsonify({
-        "summary": result[0]["summary_text"]
-    })
+    summary = result[0]["generated_text"]
+
+    return jsonify({"summary": summary})
 
 
 if __name__ == "__main__":
