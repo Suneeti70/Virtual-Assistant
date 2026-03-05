@@ -1,123 +1,161 @@
 const inputText = document.getElementById("inputText");
-const outputBox = document.getElementById("output");
-const modeSelect = document.getElementById("mode");
+const output = document.getElementById("output");
+const mode = document.getElementById("mode");
 const loader = document.getElementById("loader");
+const charCount = document.getElementById("charCount");
+const wordCount = document.getElementById("wordCount");
 
-// CHARACTER + WORD COUNT
+
+// CHARACTER + WORD COUNTER
 function updateCount() {
+
     const text = inputText.value;
 
-    document.getElementById("charCount").innerText =
-        "Characters: " + text.length + " / 2000";
+    charCount.innerText = "Characters: " + text.length + " / 2000";
 
     const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
 
-    document.getElementById("wordCount").innerText =
-        "Words: " + words;
+    wordCount.innerText = "Words: " + words;
+
 }
+
+
 
 // AUTO RESIZE TEXTAREA
-function autoResize(textarea) {
-    textarea.style.height = "auto";
-    textarea.style.height = textarea.scrollHeight + "px";
+function autoResize(element) {
+
+    element.style.height = "auto";
+    element.style.height = element.scrollHeight + "px";
+
 }
 
 
-// MAIN AI FUNCTION
+
+// MAIN AI PROCESS FUNCTION
 async function processText() {
 
     const text = inputText.value.trim();
-    const mode = modeSelect.value;
+    const selectedMode = mode.value;
 
-    if (text === "") {
+    if(text === ""){
+
         alert("Please enter text first.");
         return;
+
     }
 
     loader.classList.remove("hidden");
-    outputBox.innerText = "Processing...";
+    output.innerText = "";
 
-    try {
+    try{
 
-        const response = await fetch("http://127.0.0.1:5000/process", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
+        const response = await fetch("http://127.0.0.1:5000/process",{
+
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
             },
-            body: JSON.stringify({
-                text: text,
-                mode: mode
+
+            body:JSON.stringify({
+                text:text,
+                mode:selectedMode
             })
+
         });
 
         const data = await response.json();
 
-        outputBox.innerText = data.result;
+        output.innerText = data.result;
 
-    } catch (error) {
+    }
+    catch(error){
 
-        outputBox.innerText = "Error connecting to AI server.";
+        output.innerText = "Error connecting to AI server.";
         console.error(error);
 
     }
 
     loader.classList.add("hidden");
+
 }
 
 
 
-// CLEAR
-function clearAll() {
+// CLEAR BUTTON
+function clearAll(){
+
     inputText.value = "";
-    outputBox.innerText = "";
+    output.innerText = "Assistant response will appear here...";
+
     updateCount();
+
 }
 
 
 
-// COPY
-function copyResponse() {
+// COPY BUTTON
+function copyResponse(){
 
-    const text = outputBox.innerText;
+    const text = output.innerText;
 
-    if (text === "") {
+    if(text === "" || text === "Assistant response will appear here..."){
         alert("Nothing to copy.");
         return;
     }
 
     navigator.clipboard.writeText(text);
 
-    alert("Copied to clipboard!");
+    alert("Copied to clipboard.");
+
 }
 
 
 
-// DOWNLOAD
-function downloadResponse() {
+// DOWNLOAD BUTTON
+function downloadResponse(){
 
-    const text = outputBox.innerText;
+    const text = output.innerText;
 
-    if (text === "") {
+    if(text === "" || text === "Assistant response will appear here..."){
         alert("Nothing to download.");
         return;
     }
 
-    const blob = new Blob([text], { type: "text/plain" });
+    const blob = new Blob([text],{type:"text/plain"});
 
     const link = document.createElement("a");
 
     link.href = URL.createObjectURL(blob);
 
-    link.download = "read-ease-output.txt";
+    link.download = "assistant_response.txt";
 
     link.click();
+
 }
 
 
 
 // DARK MODE
-function toggleDarkMode() {
+function toggleDarkMode(){
 
     document.body.classList.toggle("dark");
 
 }
+
+
+
+// LOADER ANIMATION
+let dots = document.getElementById("dots");
+
+setInterval(()=>{
+
+    if(dots){
+        dots.innerText = dots.innerText.length >= 3 ? "." : dots.innerText + ".";
+    }
+
+},500);
+
+
+
+// INITIAL COUNT
+updateCount();
