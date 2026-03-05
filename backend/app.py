@@ -7,29 +7,33 @@ CORS(app)
 
 generator = pipeline("text-generation", model="gpt2")
 
-@app.route("/summarize", methods=["POST"])
-def summarize():
+@app.route("/process", methods=["POST"])
+def process():
 
     data = request.json
     text = data.get("text", "")
+    mode = data.get("mode", "summarize")
 
-    prompt = f"Summarize this in simple language:\n{text}\nSummary:"
+    if mode == "summarize":
+        prompt = f"Summarize the following text in simple language:\n{text}"
 
-    result = generator(
-        prompt,
-        max_length=80,
-        num_return_sequences=1,
-        temperature=0.5,
-        repetition_penalty=2.0,
-        do_sample=True
-    )
+    elif mode == "explain":
+        prompt = f"Explain this text in very simple terms for a beginner:\n{text}"
 
-    generated = result[0]["generated_text"]
+    elif mode == "improve":
+        prompt = f"Rewrite this text in a more professional and clear way:\n{text}"
 
-    summary = generated.replace(prompt, "").strip()
+    elif mode == "translate":
+        prompt = f"Rewrite this text in simple English:\n{text}"
 
-    return jsonify({"summary": summary})
+    else:
+        prompt = text
 
+    result = generator(prompt, max_length=200, num_return_sequences=1)
+
+    response = result[0]["generated_text"]
+
+    return jsonify({"response": response})
 
 if __name__ == "__main__":
     app.run(debug=True)
