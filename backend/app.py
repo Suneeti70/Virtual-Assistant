@@ -5,26 +5,31 @@ from transformers import pipeline
 app = Flask(__name__)
 CORS(app)
 
-summarizer = pipeline("text-generation", model="gpt2")
+generator = pipeline("text-generation", model="gpt2")
 
 @app.route("/summarize", methods=["POST"])
 def summarize():
+
     data = request.json
     text = data.get("text", "")
 
-    prompt = f"Summarize this text in simple language:\n{text}\nSummary:"
+    prompt = f"Summarize this in simple language:\n{text}\nSummary:"
 
-    result = summarizer(
+    result = generator(
         prompt,
-        max_length=120,
-        do_sample=False
+        max_length=80,
+        num_return_sequences=1,
+        temperature=0.5,
+        repetition_penalty=2.0,
+        do_sample=True
     )
 
     generated = result[0]["generated_text"]
 
-    summary = generated.split("Summary:")[-1].strip()
+    summary = generated.replace(prompt, "").strip()
 
     return jsonify({"summary": summary})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
