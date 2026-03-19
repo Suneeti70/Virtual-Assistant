@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
     <title>Read Ease - Virtual Assistant</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
+<body>
 <body>
 
+<!-- 🌊 Animated Background -->
+<div class="background-animation"></div>
+
 <div class="container">
+    <h3 class="hero-text">
+    Understand Anything. Instantly.
+</h3>
 
     <div class="header">
         <div>
@@ -23,18 +30,15 @@
     </p>
 
     <!-- MODE SELECT -->
-    <div class="mode-selector">
-        <select id="mode">
-            <option value="summarize">Summarize</option>
-            <option value="explain">Explain</option>
-            <option value="improve">Improve Writing</option>
-            <option value="translate">Translate to Simple English</option>
-        </select>
-    </div>
+  <div class="mode-cards">
+    <div class="mode-card active" data-mode="summarize">📝 Summarize</div>
+    <div class="mode-card" data-mode="explain">🧠 Explain</div>
+    <div class="mode-card" data-mode="improve">✨ Improve</div>
+    <div class="mode-card" data-mode="translate">🌍 Simplify</div>
+</div>
 
-    <!-- INPUT TEXT -->
-    <textarea
-        id="inputText"
+    <!-- INPUT -->
+    <textarea id="inputText"
         placeholder="Type, paste, or speak your text here..."
         maxlength="2000"
         oninput="updateCount(); autoResize(this)">
@@ -47,18 +51,18 @@
 
     <!-- BUTTONS -->
     <div class="button-group">
+    <button class="btn-main" onclick="processText()">Generate</button>
 
-        <button onclick="processText()">Generate</button>
+    <button class="btn-voice" onclick="startVoice()">🎤 Speak</button>
 
-        <button onclick="startVoice()">🎤 Speak</button>
+    <button class="btn-voice" onclick="speakOutput()">🔊 Listen</button>
 
-        <button onclick="clearAll()">Clear</button>
+    <button class="btn-main" onclick="clearAll()">Clear</button>
 
-        <button onclick="copyResponse()">Copy</button>
+    <button class="btn-main" onclick="copyResponse()">Copy</button>
 
-        <button onclick="downloadResponse()">Download</button>
-
-    </div>
+    <button class="btn-main" onclick="downloadResponse()">Download</button>
+</div>
 
     <!-- LOADER -->
     <div id="loader" class="thinking hidden">
@@ -73,6 +77,6 @@
 </div>
 
 <script src="script.js"></script>
-
+</body>
 </body>
 </html>
