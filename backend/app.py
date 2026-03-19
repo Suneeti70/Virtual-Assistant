@@ -5,14 +5,13 @@ from transformers import pipeline
 app = Flask(__name__)
 CORS(app)
 
-# Load AI Models
 print("Loading AI models...")
 
-# Summarization model
+
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
-# Text generation model for other modes
-generator = pipeline("text-generation", model="gpt2")
+
+generator = pipeline("text2text-generation", model="google/flan-t5-base")
 
 print("Models loaded successfully.")
 
@@ -30,7 +29,6 @@ def process_text():
 
     try:
 
-        # ---------------- SUMMARIZE ----------------
         if mode == "summarize":
 
             result = summarizer(
@@ -42,52 +40,50 @@ def process_text():
 
             output = result[0]["summary_text"]
 
-        # ---------------- EXPLAIN ----------------
+
         elif mode == "explain":
 
-            prompt = f"Explain the following text in simple terms:\n{text}"
+            prompt = f"Explain this in simple terms:\n{text}"
 
             result = generator(
                 prompt,
-                max_length=200,
-                num_return_sequences=1
+                max_length=150
             )
 
             output = result[0]["generated_text"]
 
-        # ---------------- IMPROVE WRITING ----------------
         elif mode == "improve":
 
-            prompt = f"Improve the writing and clarity of this text:\n{text}"
+            prompt = f"Improve the clarity and grammar of this text:\n{text}"
 
             result = generator(
                 prompt,
-                max_length=200,
-                num_return_sequences=1
+                max_length=150
             )
 
             output = result[0]["generated_text"]
 
-        # ---------------- TRANSLATE TO SIMPLE ENGLISH ----------------
+
         elif mode == "translate":
 
-            prompt = f"Rewrite the following text in very simple English:\n{text}"
+            prompt = f"Rewrite this in very simple English:\n{text}"
 
             result = generator(
                 prompt,
-                max_length=200,
-                num_return_sequences=1
+                max_length=150
             )
 
             output = result[0]["generated_text"]
 
-        # ---------------- DEFAULT ----------------
+
         else:
             output = "Invalid mode selected."
+
 
         return jsonify({
             "result": output
         })
+
 
     except Exception as e:
         print("Error:", e)
