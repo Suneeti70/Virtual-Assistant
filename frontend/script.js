@@ -6,7 +6,6 @@ const charCount = document.getElementById("charCount");
 const wordCount = document.getElementById("wordCount");
 
 
-// CHARACTER + WORD COUNTER
 function updateCount() {
 
     const text = inputText.value;
@@ -16,24 +15,20 @@ function updateCount() {
     const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
 
     wordCount.innerText = "Words: " + words;
-
 }
 
 
-// AUTO RESIZE TEXTAREA
 function autoResize(element) {
 
     element.style.height = "auto";
     element.style.height = element.scrollHeight + "px";
-
 }
 
 
-// MAIN AI PROCESS FUNCTION
 async function processText() {
 
     const text = inputText.value.trim();
-    const selectedMode = mode.value;
+    const selectedMode = window.selectedMode || "summarize";
 
     if(text === ""){
         alert("Please enter text first.");
@@ -41,42 +36,43 @@ async function processText() {
     }
 
     loader.classList.remove("hidden");
-    output.innerText = "";
+    typeText(data.result);
 
     try{
 
-        const response = await fetch("http://127.0.0.1:5000/process",{
+        const response = await fetch("http://127.0.0.1:5000/process", {
 
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
             },
 
-            body:JSON.stringify({
-                text:text,
-                mode:selectedMode
+            body: JSON.stringify({
+                text: text,
+                mode: selectedMode
             })
-
         });
 
         const data = await response.json();
 
-        output.innerText = data.result;
+        if(data.result){
+            output.innerText = data.result;
 
-    }
-    catch(error){
+            speakResponse();
+
+        } else {
+            output.innerText = "Unexpected response from server.";
+        }
+
+    } catch(error){
 
         output.innerText = "Error connecting to AI server.";
         console.error(error);
-
     }
 
     loader.classList.add("hidden");
-
 }
 
-
-// VOICE INPUT FUNCTION
 function startVoice(){
 
     if(!('webkitSpeechRecognition' in window)){
@@ -87,14 +83,12 @@ function startVoice(){
     const recognition = new webkitSpeechRecognition();
 
     recognition.lang = "en-US";
-    recognition.continuous = false;
     recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
     recognition.start();
 
-    recognition.onstart = function(){
-        output.innerText = "🎤 Listening... Speak now.";
-    };
+    output.innerText = "🎤 Listening... Speak now.";
 
     recognition.onresult = function(event){
 
@@ -106,34 +100,52 @@ function startVoice(){
         autoResize(inputText);
 
         output.innerText = "Voice captured. Click Generate.";
-
     };
 
     recognition.onerror = function(event){
-        console.error("Speech recognition error:", event.error);
-        output.innerText = "Voice recognition error.";
+        console.error(event.error);
+        output.innerText = "❌ Voice recognition error.";
     };
 
+    recognition.onend = function(){
+        console.log("Voice recognition ended.");
+    };
 }
 
+function speakResponse(){
 
-// CLEAR BUTTON
+    const text = output.innerText;
+
+    if(text === "" || text.includes("Assistant response")){
+        return;
+    }
+
+    const speech = new SpeechSynthesisUtterance(text);
+
+    speech.lang = "en-US";
+    speech.rate = 1;
+    speech.pitch = 1;
+    speech.volume = 1;
+
+    window.speechSynthesis.cancel(); 
+    window.speechSynthesis.speak(speech);
+}
+
 function clearAll(){
 
     inputText.value = "";
     output.innerText = "Assistant response will appear here...";
 
     updateCount();
-
 }
 
 
-// COPY BUTTON
+// ================= COPY =================
 function copyResponse(){
 
     const text = output.innerText;
 
-    if(text === "" || text === "Assistant response will appear here..."){
+    if(text === "" || text.includes("Assistant response")){
         alert("Nothing to copy.");
         return;
     }
@@ -141,52 +153,119 @@ function copyResponse(){
     navigator.clipboard.writeText(text);
 
     alert("Copied to clipboard.");
-
 }
 
-
-// DOWNLOAD BUTTON
 function downloadResponse(){
 
     const text = output.innerText;
 
-    if(text === "" || text === "Assistant response will appear here..."){
+    if(text === "" || text.includes("Assistant response")){
         alert("Nothing to download.");
         return;
     }
 
-    const blob = new Blob([text],{type:"text/plain"});
+    const blob = new Blob([text], {type:"text/plain"});
 
     const link = document.createElement("a");
 
     link.href = URL.createObjectURL(blob);
-
     link.download = "assistant_response.txt";
 
     link.click();
-
 }
 
 
-// DARK MODE
 function toggleDarkMode(){
-
     document.body.classList.toggle("dark");
-
 }
 
-
-// LOADER ANIMATION
 let dots = document.getElementById("dots");
 
-setInterval(()=>{
+setInterval(() => {
 
     if(dots){
         dots.innerText = dots.innerText.length >= 3 ? "." : dots.innerText + ".";
     }
 
-},500);
+}, 500);
 
-
-// INITIAL COUNT
 updateCount();
+
+function speakOutput(){
+
+    const text = document.getElementById("output").innerText;
+
+    if(!text || text.includes("Assistant response")){
+        alert("Nothing to speak.");
+        return;
+    }
+
+    const speech = new SpeechSynthesisUtterance(text);
+
+    speech.rate = 1;
+    speech.pitch = 1;
+
+    window.speechSynthesis.speak(speech);
+}
+
+let selectedMode = "summarize";
+
+document.querySelectorAll(".mode-card").forEach(card => {
+
+    card.addEventListener("click", () => {
+
+        document.querySelectorAll(".mode-card").forEach(c => c.classList.remove("active"));
+
+        card.classList.add("active");
+
+        selectedMode = card.getAttribute("data-mode");
+
+    });
+
+});
+
+function typeText(text) {
+
+    output.innerText = "";
+    let i = 0;
+
+    function typing() {
+        if (i < text.length) {
+            output.innerText += text.charAt(i);
+            i++;
+            setTimeout(typing, 15);
+        }
+    }
+
+    typing();
+}
+
+function typeText(text) {
+
+    output.innerText = "";
+    let i = 0;
+
+    function typing() {
+        if (i < text.length) {
+            output.innerText += text.charAt(i);
+            i++;
+            setTimeout(typing, 15);
+        }
+    }
+
+    typing();
+}
+
+let typingTimer;
+
+inputText.addEventListener("input", () => {
+
+    clearTimeout(typingTimer);
+
+    typingTimer = setTimeout(() => {
+
+        output.innerText = "🤖 It looks like you paused... Need help?";
+
+    }, 4000);
+
+});
