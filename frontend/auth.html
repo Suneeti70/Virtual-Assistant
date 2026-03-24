@@ -1,1 +1,444 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReadEase AI — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  :root {
+    --ink: #0a0a0f;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f5f0e8;
+    --muted: #6b6879;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(201,168,76,0.2);
+  }
+ 
+  html, body { height: 100%; }
+ 
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--ink);
+    color: var(--cream);
+    display: flex;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+ 
+  /* ── LEFT PANEL ── */
+  .left {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+    overflow: hidden;
+  }
+ 
+  .left::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 30% 50%, rgba(201,168,76,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 80% 80%, rgba(100,80,200,0.08) 0%, transparent 60%);
+  }
+ 
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.05) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+ 
+  .brand {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 60px;
+  }
+ 
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 60px;
+  }
+ 
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    border: 1.5px solid var(--gold);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--gold);
+    font-weight: 600;
+  }
+ 
+  .logo-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--cream);
+    opacity: 0.9;
+    text-transform: uppercase;
+  }
+ 
+  .tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--cream);
+    margin-bottom: 24px;
+  }
+ 
+  .tagline em {
+    font-style: italic;
+    color: var(--gold);
+  }
+ 
+  .sub {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 380px;
+    font-weight: 300;
+  }
+ 
+  .features-list {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+ 
+  .feat {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+    color: rgba(245,240,232,0.65);
+  }
+ 
+  .feat-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+ 
+  /* ── RIGHT PANEL ── */
+  .right {
+    width: 480px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    background: rgba(255,255,255,0.02);
+    border-left: 1px solid var(--glass-border);
+  }
+ 
+  .form-box {
+    width: 100%;
+    max-width: 380px;
+  }
+ 
+  .tab-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+ 
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: color 0.25s;
+    position: relative;
+    background: none;
+    border: none;
+    color: var(--muted);
+  }
+ 
+  .tab::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0; right: 0;
+    height: 1.5px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+ 
+  .tab.active {
+    color: var(--gold);
+  }
+ 
+  .tab.active::after {
+    transform: scaleX(1);
+  }
+ 
+  .form-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    font-weight: 400;
+    color: var(--cream);
+    margin-bottom: 8px;
+  }
+ 
+  .form-hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 36px;
+  }
+ 
+  .field {
+    margin-bottom: 22px;
+  }
+ 
+  label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+ 
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 13px 16px;
+    background: var(--glass);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+ 
+  input::placeholder { color: rgba(255,255,255,0.2); }
+ 
+  input:focus {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.05);
+  }
+ 
+  .forgot {
+    display: block;
+    text-align: right;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: -12px;
+    margin-bottom: 22px;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .forgot:hover { color: var(--gold); }
+ 
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--gold);
+    border: none;
+    border-radius: 8px;
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+ 
+  .divider {
+    text-align: center;
+    margin: 24px 0;
+    font-size: 12px;
+    color: var(--muted);
+    position: relative;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 38%;
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+  }
+  .divider::before { left: 0; }
+  .divider::after { right: 0; }
+ 
+  .btn-google {
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-google:hover {
+    border-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.04);
+  }
+ 
+  .panel { display: none; }
+  .panel.active { display: block; }
+ 
+  /* floating orbs */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    animation: drift 8s ease-in-out infinite alternate;
+  }
+  .orb1 { width:300px; height:300px; background:rgba(201,168,76,0.06); top:-100px; right:-100px; }
+  .orb2 { width:200px; height:200px; background:rgba(100,80,200,0.07); bottom:50px; left:-80px; animation-delay:-4s; }
+ 
+  @keyframes drift {
+    from { transform: translate(0,0) scale(1); }
+    to   { transform: translate(20px,30px) scale(1.1); }
+  }
+ 
+  @media (max-width: 900px) {
+    body { flex-direction: column; overflow-y: auto; }
+    .left { padding: 40px 30px 30px; }
+    .tagline { font-size: 36px; }
+    .right { width: 100%; border-left: none; border-top: 1px solid var(--glass-border); padding: 30px; }
+  }
+</style>
+</head>
+<body>
+ 
+<div class="left">
+  <div class="grid-bg"></div>
+  <div class="brand" style="position:relative;z-index:1">
+    <div class="brand-logo">
+      <div class="logo-icon">R</div>
+      <span class="logo-name">ReadEase AI</span>
+    </div>
+    <h1 class="tagline">
+      Words made<br><em>simple.</em><br>Ideas made clear.
+    </h1>
+    <p class="sub">Your intelligent companion for summarizing, explaining, and refining any text — in seconds.</p>
+    <div class="features-list">
+      <div class="feat"><div class="feat-dot"></div>Smart summarization of long documents</div>
+      <div class="feat"><div class="feat-dot"></div>Plain-language explanations</div>
+      <div class="feat"><div class="feat-dot"></div>Grammar and clarity improvement</div>
+      <div class="feat"><div class="feat-dot"></div>Voice input & spoken responses</div>
+    </div>
+  </div>
+</div>
+ 
+<div class="right">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+ 
+  <div class="form-box">
+    <div class="tab-row">
+      <button class="tab active" onclick="showTab('login',this)">Sign In</button>
+      <button class="tab" onclick="showTab('register',this)">Create Account</button>
+    </div>
+ 
+    <!-- LOGIN -->
+    <div class="panel active" id="login">
+      <h2 class="form-title">Welcome back</h2>
+      <p class="form-hint">Enter your credentials to continue</p>
+ 
+      <div class="field">
+        <label>Email address</label>
+        <input type="email" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••">
+      </div>
+      <a href="#" class="forgot">Forgot password?</a>
+ 
+      <button class="btn-primary" onclick="goToApp()">Sign In →</button>
+      <div class="divider">or</div>
+      <button class="btn-google">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M5.26 9.77A7.5 7.5 0 0 1 12 4.5c1.95 0 3.73.75 5.07 1.97l3.77-3.77A12 12 0 0 0 0 12c0 1.99.49 3.87 1.35 5.52l4.35-3.36A7.5 7.5 0 0 1 5.26 9.77Z"/><path fill="#FBBC05" d="M1.35 17.52A12 12 0 0 0 12 24c3.23 0 6.16-1.18 8.39-3.12l-4.04-3.12A7.48 7.48 0 0 1 5.7 14.16l-4.35 3.36Z"/><path fill="#4285F4" d="M23.76 12.27c0-.79-.07-1.56-.2-2.27H12v4.28h6.6a5.65 5.65 0 0 1-2.45 3.71l4.04 3.12C22.45 18.77 23.76 15.72 23.76 12.27Z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.91l-4.04-3.12A7.5 7.5 0 0 1 5.7 14.16L1.35 17.52A12 12 0 0 0 12 24Z"/></svg>
+        Continue with Google
+      </button>
+    </div>
+ 
+    <!-- REGISTER -->
+    <div class="panel" id="register">
+      <h2 class="form-title">Get started free</h2>
+      <p class="form-hint">Create your account in under a minute</p>
+ 
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" placeholder="Your name">
+      </div>
+      <div class="field">
+        <label>Email address</label>
+        <input type="email" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="Min. 8 characters">
+      </div>
+ 
+      <button class="btn-primary" onclick="goToApp()" style="margin-top:4px">Create Account →</button>
+      <div class="divider">or</div>
+      <button class="btn-google">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M5.26 9.77A7.5 7.5 0 0 1 12 4.5c1.95 0 3.73.75 5.07 1.97l3.77-3.77A12 12 0 0 0 0 12c0 1.99.49 3.87 1.35 5.52l4.35-3.36A7.5 7.5 0 0 1 5.26 9.77Z"/><path fill="#FBBC05" d="M1.35 17.52A12 12 0 0 0 12 24c3.23 0 6.16-1.18 8.39-3.12l-4.04-3.12A7.48 7.48 0 0 1 5.7 14.16l-4.35 3.36Z"/><path fill="#4285F4" d="M23.76 12.27c0-.79-.07-1.56-.2-2.27H12v4.28h6.6a5.65 5.65 0 0 1-2.45 3.71l4.04 3.12C22.45 18.77 23.76 15.72 23.76 12.27Z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.91l-4.04-3.12A7.5 7.5 0 0 1 5.7 14.16L1.35 17.52A12 12 0 0 0 12 24Z"/></svg>
+        Continue with Google
+      </button>
+    </div>
+ 
+  </div>
+</div>
+ 
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+function goToApp() {
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>
