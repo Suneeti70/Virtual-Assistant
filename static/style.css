@@ -1,14 +1,18 @@
-
+/* static/css/style.css */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-    --bg-color: #050b14;
+    /* Updated background color to dark pink/purple based on image */
+    --bg-color: #1a0f2e;
     --panel-bg: #111827;
     --text-main: #f3f4f6;
     --text-muted: #9ca3af;
-    --accent: #3b82f6;
-    --accent-hover: #2563eb;
+    /* Updated accent to light pink based on image */
+    --accent: #ec4899;
+    --accent-hover: #db2777;
     --border: #1f2937;
+    /* Gradient for generate button based on image */
+    --gradient-btn: linear-gradient(90deg, #ec4899 0%, #a855f7 100%);
 }
 
 * {
@@ -26,6 +30,58 @@ body {
     flex-direction: column;
 }
 
+/* Login Page Styles */
+.login-body {
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    background: var(--panel-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.login-logo {
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.login-content h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.login-content p {
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    font-size: 0.95rem;
+}
+
+.login-google-btn-large {
+    background: white;
+    color: #1f2937;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+}
+
+.login-google-btn-large:hover {
+    background: #f3f4f6;
+}
+
+/* Dashboard Styles */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -77,25 +133,13 @@ body {
     width: 35px;
     height: 35px;
     border-radius: 50%;
-    background: #e879f9;
+    /* Using accent color for avatar */
+    background: var(--accent);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
     color: white;
-}
-
-.login-google-btn {
-    background: white;
-    color: #1f2937;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
 .dashboard {
@@ -207,13 +251,15 @@ textarea {
 .mode-btn.active {
     border-color: var(--accent);
     color: var(--accent);
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(236, 72, 153, 0.1);
+    /* Pink transparent bg */
 }
 
 .generate-btn {
     width: 100%;
     margin-top: 2rem;
-    background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+    /* Updated to pink/purple gradient based on image */
+    background: var(--gradient-btn);
     border: none;
     color: white;
     padding: 1.2rem;
