@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
     <header class="navbar">
         <div class="logo-area">
@@ -17,19 +19,15 @@
             </div>
         </div>
         <div class="nav-actions">
-            {% if current_user.is_authenticated %}
-                <span class="welcome-text">Hi, {{ current_user.name }}</span>
-                <a href="{{ url_for('logout') }}" class="icon-btn" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></a>
-                <div class="avatar">{{ current_user.name[0] }}</div>
-            {% else %}
-                <a href="{{ url_for('login') }}" class="login-google-btn">
-                    <i class="fa-brands fa-google"></i> Login with Google
-                </a>
-            {% endif %}
+            <span class="welcome-text">Hi, {{ current_user.name }}</span>
+            <a href="{{ url_for('logout') }}" class="icon-btn" title="Logout"><i
+                    class="fa-solid fa-right-from-bracket"></i></a>
+            <div class="avatar">{{ current_user.name[0] }}</div>
         </div>
     </header>
 
     <main class="dashboard">
+        
         <section class="panel input-panel">
             <div class="panel-header">
                 <h2>Input Text</h2>
@@ -38,30 +36,27 @@
             <div class="textarea-wrapper">
                 <textarea id="inputText" placeholder="Paste or type your text here..."></textarea>
                 <div class="text-actions">
-                    <button class="icon-btn" id="clearBtn" title="Clear Text"><i class="fa-regular fa-trash-can"></i></button>
-                    <button class="icon-btn" id="micBtn" title="Voice Input"><i class="fa-solid fa-microphone"></i></button>
+                    <button class="icon-btn" id="clearBtn" title="Clear Text"><i
+                            class="fa-regular fa-trash-can"></i></button>
+                    <button class="icon-btn" id="micBtn" title="Voice Input"><i
+                            class="fa-solid fa-microphone"></i></button>
                 </div>
             </div>
 
             <div class="mode-selection">
                 <h3>Choose Mode</h3>
                 <div class="mode-grid">
-                    <button class="mode-btn active" data-mode="Summarize"><i class="fa-solid fa-compress"></i> Summarize</button>
+                    <button class="mode-btn active" data-mode="Summarize"><i class="fa-solid fa-compress"></i>
+                        Summarize</button>
                     <button class="mode-btn" data-mode="Explain"><i class="fa-solid fa-book-open"></i> Explain</button>
                     <button class="mode-btn" data-mode="Improve"><i class="fa-solid fa-pen-nib"></i> Improve</button>
                     <button class="mode-btn" data-mode="Simplify"><i class="fa-solid fa-globe"></i> Simplify</button>
                 </div>
             </div>
 
-            {% if current_user.is_authenticated %}
-                <button id="generateBtn" class="generate-btn">
-                    <span id="btnText">Generate Summarize</span> <i class="fa-solid fa-chevron-right"></i>
-                </button>
-            {% else %}
-                <button class="generate-btn disabled-btn" onclick="alert('Please log in first!')">
-                    <span>Login to Generate</span>
-                </button>
-            {% endif %}
+            <button id="generateBtn" class="generate-btn">
+                <span id="btnText">Generate Summarize</span> <i class="fa-solid fa-chevron-right"></i>
+            </button>
         </section>
 
         <section class="panel output-panel">
@@ -69,8 +64,10 @@
                 <h2>AI Result</h2>
                 <div class="result-actions">
                     <button class="icon-btn" id="copyBtn" title="Copy"><i class="fa-regular fa-copy"></i></button>
-                    <button class="icon-btn" id="downloadBtn" title="Download"><i class="fa-solid fa-download"></i></button>
-                    <button class="icon-btn" id="speakBtn" title="Listen"><i class="fa-solid fa-volume-high"></i></button>
+                    <button class="icon-btn" id="downloadBtn" title="Download"><i
+                            class="fa-solid fa-download"></i></button>
+                    <button class="icon-btn" id="speakBtn" title="Listen"><i
+                            class="fa-solid fa-volume-high"></i></button>
                 </div>
             </div>
             <div class="result-box" id="resultBox">
@@ -85,17 +82,16 @@
             <div class="history-section">
                 <h3>Recent Activity (Click to restore)</h3>
                 <ul class="history-list" id="historyList">
-                    {% if current_user.is_authenticated and history %}
-                        {% for item in history %}
-                            <li class="history-item" data-input="{{ item.input_text }}" data-output="{{ item.output_text }}" data-mode="{{ item.mode }}">
-                                <span class="badge">{{ item.mode }}</span>
-                                <p>"{{ item.input_text[:60] }}..."</p>
-                            </li>
-                        {% endfor %}
-                    {% elif current_user.is_authenticated %}
-                        <p class="empty-text" id="noHistory">No saved history yet.</p>
+                    {% if history %}
+                    {% for item in history %}
+                    <li class="history-item" data-input="{{ item.input_text }}" data-output="{{ item.output_text }}"
+                        data-mode="{{ item.mode }}">
+                        <span class="badge">{{ item.mode }}</span>
+                        <p>"{{ item.input_text[:60] }}..."</p>
+                    </li>
+                    {% endfor %}
                     {% else %}
-                        <p class="empty-text">Log in to track your searches.</p>
+                    <p class="empty-text" id="noHistory">No saved history yet.</p>
                     {% endif %}
                 </ul>
             </div>
@@ -103,4 +99,5 @@
     </main>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>
