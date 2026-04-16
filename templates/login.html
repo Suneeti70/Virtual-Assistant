@@ -1,1 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaSu AI | Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="login-body">
+    <div class="login-container">
+        <div class="logo-area login-logo">
+            <div class="logo-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <div class="brand-text">
+                <h1>MaSu AI</h1>
+                <p>VIRTUAL ASSISTANT</p>
+            </div>
+        </div>
+
+        <div class="login-content">
+            <h2>Welcome to MaSu AI</h2>
+            <p>Your powerful AI writing assistant. Please sign in to continue.</p>
+
+            <a href="{{ url_for('login_google') }}" class="login-google-btn-large">
+                <i class="fa-brands fa-google"></i> Sign in with Google
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>
