@@ -1,200 +1,190 @@
+/* static/js/main.js */
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Elements ---
     const inputText = document.getElementById('inputText');
     const textStats = document.getElementById('textStats');
-    const modeBtns = document.querySelectorAll('.mode-btn');
+    const clearBtn = document.getElementById('clearBtn');
     const generateBtn = document.getElementById('generateBtn');
     const btnText = document.getElementById('btnText');
-    const resultContent = document.getElementById('resultContent');
-    const emptyState = document.getElementById('emptyState');
-    const loader = document.getElementById('loader');
-    const speakBtn = document.getElementById('speakBtn');
+    const modeButtons = document.querySelectorAll('.mode-btn');
     const historyList = document.getElementById('historyList');
-    const noHistoryText = document.getElementById('noHistory');
+    const noHistory = document.getElementById('noHistory');
 
+    // Output Elements
+    const emptyState = document.getElementById('emptyState');
+    const resultContent = document.getElementById('resultContent');
+    const loader = document.getElementById('loader');
+    const copyBtn = document.getElementById('copyBtn');
+
+    // State
     let currentMode = 'Summarize';
-    let isSpeaking = false;
+    let isProcessing = false;
 
-    // Word and Character counter
-    function updateStats() {
+    // --- Core Functions ---
+
+    // 1. Text Statistics
+    const updateStats = () => {
         const text = inputText.value;
-        const chars = text.length;
-        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
-        textStats.textContent = `${words} words • ${chars} chars`;
-    }
-    inputText.addEventListener('input', updateStats);
+        const charCount = text.length;
+        const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+        textStats.textContent = `${wordCount} words • ${charCount} chars`;
+    };
 
-    // Clear content
-    document.getElementById('clearBtn').addEventListener('click', () => {
+    // 2. Clear Text
+    const clearText = () => {
         inputText.value = '';
         updateStats();
-    });
+        inputText.focus();
+    };
 
-    // Toggle modes
-    modeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            modeBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentMode = btn.dataset.mode;
-            if (btnText) btnText.textContent = `Generate ${currentMode}`;
-        });
-    });
+    // 3. Mode Selection
+    const handleModeChange = (e) => {
+        // Remove active class from all
+        modeButtons.forEach(btn => btn.classList.remove('active'));
 
-    // Generate Request
-    if (generateBtn) {
-        generateBtn.addEventListener('click', async () => {
-            const text = inputText.value.trim();
-            if (!text) return alert('Please enter some text first.');
+        // Add to clicked
+        const clickedBtn = e.currentTarget;
+        clickedBtn.classList.add('active');
 
-            emptyState.style.display = 'none';
-            resultContent.style.display = 'none';
-            loader.style.display = 'block';
+        // Update state and button text
+        currentMode = clickedBtn.getAttribute('data-mode');
+        btnText.textContent = `Generate ${currentMode}`;
+    };
 
-            try {
-                const response = await fetch('/api/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: text, mode: currentMode })
-                });
-                
-                const data = await response.json();
-                loader.style.display = 'none';
-                
-                if (response.ok) {
-                    // Update AI box
-                    resultContent.textContent = data.result;
-                    resultContent.style.display = 'block';
+    // 4. API Call & History Update
+    const generateContent = async () => {
+        const text = inputText.value;
+        if (!text || isProcessing) return;
 
-                    // DYNAMICALLY ADD TO HISTORY (Instead of reloading page)
-                    if (noHistoryText) noHistoryText.remove();
+        isProcessing = true;
+        showLoading();
 
-                    const newHistoryLi = document.createElement('li');
-                    newHistoryLi.className = 'history-item';
-                    newHistoryLi.setAttribute('data-input', data.input);
-                    newHistoryLi.setAttribute('data-output', data.result);
-                    newHistoryLi.setAttribute('data-mode', data.mode);
-                    newHistoryLi.innerHTML = `
-                        <span class="badge">${data.mode}</span>
-                        <p>"${data.input.substring(0, 60)}..."</p>
-                    `;
-                    
-                    // Add listener to the newly created history item
-                    addHistoryClickListener(newHistoryLi);
-
-                    // Insert at the top of the history list
-                    historyList.insertBefore(newHistoryLi, historyList.firstChild);
-                } else {
-                    resultContent.textContent = 'Error: ' + data.error;
-                    resultContent.style.display = 'block';
-                }
-            } catch (error) {
-                loader.style.display = 'none';
-                resultContent.textContent = 'Connection error occurred.';
-                resultContent.style.display = 'block';
-            }
-        });
-    }
-
-    // Function to handle clicking history items
-    function addHistoryClickListener(element) {
-        element.addEventListener('click', () => {
-            const savedInput = element.getAttribute('data-input');
-            const savedOutput = element.getAttribute('data-output');
-            const savedMode = element.getAttribute('data-mode');
-
-            // 1. Restore input textarea
-            inputText.value = savedInput;
-            updateStats();
-
-            // 2. Restore output panel
-            emptyState.style.display = 'none';
-            loader.style.display = 'none';
-            resultContent.textContent = savedOutput;
-            resultContent.style.display = 'block';
-
-            // 3. Highlight matched mode button
-            modeBtns.forEach(b => {
-                b.classList.remove('active');
-                if (b.dataset.mode === savedMode) {
-                    b.classList.add('active');
-                    currentMode = savedMode;
-                    if (btnText) btnText.textContent = `Generate ${currentMode}`;
-                }
+        try {
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    mode: currentMode
+                }),
             });
-        });
-    }
 
-    // Apply click listeners to all existing history loaded by Jinja
-    document.querySelectorAll('.history-item').forEach(item => {
-        addHistoryClickListener(item);
-    });
+            const data = await response.json();
 
-    // Clip to clipboard
-    document.getElementById('copyBtn').addEventListener('click', () => {
-        if (resultContent.textContent) {
-            navigator.clipboard.writeText(resultContent.textContent);
-            alert('Copied to clipboard!');
+            if (response.ok) {
+                showResult(data.result);
+                // Add new entry to top of history list dynamically
+                addHistoryItem(data);
+            } else {
+                showError(data.error || 'Something went wrong.');
+            }
+        } catch (error) {
+            showError('Failed to connect to server.');
+        } finally {
+            isProcessing = false;
         }
-    });
+    };
 
-    // Download as .txt
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-        if (!resultContent.textContent) return;
-        const blob = new Blob([resultContent.textContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `LumiraText_${currentMode}.txt`;
-        a.click();
-    });
+    // --- Helper Functions (UI Updates) ---
 
-    // TTS with Stop Toggle
-    speakBtn.addEventListener('click', () => {
-        if (!resultContent.textContent) return;
+    const showLoading = () => {
+        generateBtn.disabled = true;
+        btnText.textContent = 'Processing...';
+        emptyState.style.display = 'none';
+        resultContent.style.display = 'none';
+        loader.style.display = 'block';
+    };
 
-        if (isSpeaking) {
-            window.speechSynthesis.cancel();
-            isSpeaking = false;
-            speakBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-        } else {
-            const utterance = new SpeechSynthesisUtterance(resultContent.textContent);
-            utterance.onend = () => {
-                isSpeaking = false;
-                speakBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-            };
-            window.speechSynthesis.speak(utterance);
-            isSpeaking = true;
-            speakBtn.innerHTML = '<i class="fa-solid fa-circle-stop"></i>';
-        }
-    });
+    const showResult = (text) => {
+        generateBtn.disabled = false;
+        btnText.textContent = `Generate ${currentMode}`;
+        loader.style.display = 'none';
+        resultContent.textContent = text;
+        resultContent.style.display = 'block';
+    };
 
-    // Speech Recognition
-    const micBtn = document.getElementById('micBtn');
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const showError = (message) => {
+        generateBtn.disabled = false;
+        btnText.textContent = `Generate ${currentMode}`;
+        loader.style.display = 'none';
+        resultContent.innerHTML = `<span style="color: #ef4444;">Error: ${message}</span>`;
+        resultContent.style.display = 'block';
+    };
 
-    if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.lang = 'en-US';
+    const addHistoryItem = (data) => {
+        // Remove 'No history' text if it exists
+        if (noHistory) noHistory.remove();
 
-        micBtn.addEventListener('click', () => {
-            try {
-                recognition.start();
-                micBtn.style.color = '#ef4444'; 
-            } catch (e) {
-                recognition.stop();
+        const li = document.createElement('li');
+        li.className = 'history-item';
+
+        // Store data as attributes for restoration
+        li.setAttribute('data-input', data.input);
+        li.setAttribute('data-output', data.result);
+        li.setAttribute('data-mode', data.mode);
+
+        const truncatedInput = data.input.length > 60 ? data.input.substring(0, 60) + '...' : data.input;
+
+        li.innerHTML = `
+            <span class="badge">${data.mode}</span>
+            <p>"${truncatedInput}"</p>
+        `;
+
+        // Add event listener to new item
+        li.addEventListener('click', restoreFromHistory);
+
+        historyList.prepend(li);
+    };
+
+    // 5. Restore from History
+    const restoreFromHistory = (e) => {
+        const item = e.currentTarget;
+        const input = item.getAttribute('data-input');
+        const output = item.getAttribute('data-output');
+        const mode = item.getAttribute('data-mode');
+
+        // Update Input
+        inputText.value = input;
+        updateStats();
+
+        // Update Output
+        showResult(output);
+
+        // Update Mode Button
+        modeButtons.forEach(btn => {
+            if (btn.getAttribute('data-mode') === mode) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
             }
         });
+        currentMode = mode;
+        btnText.textContent = `Generate ${currentMode}`;
+    };
 
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            inputText.value += (inputText.value ? ' ' : '') + transcript;
-            updateStats();
-        };
+    // 6. Copy Output
+    const copyOutput = () => {
+        const text = resultContent.textContent;
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => {
+            // Optional: Show a brief "Copied!" notification
+            copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
+            setTimeout(() => {
+                copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+            }, 2000);
+        });
+    };
 
-        recognition.onend = () => {
-            micBtn.style.color = ''; 
-        };
-    } else {
-        micBtn.style.display = 'none';
-    }
+    // --- Event Listeners ---
+    inputText.addEventListener('input', updateStats);
+    clearBtn.addEventListener('click', clearText);
+    generateBtn.addEventListener('click', generateContent);
+    copyBtn.addEventListener('click', copyOutput);
+    modeButtons.forEach(btn => btn.addEventListener('click', handleModeChange));
+
+    // Add listeners to existing history items loaded on page start
+    const existingHistoryItems = document.querySelectorAll('.history-item');
+    existingHistoryItems.forEach(item => item.addEventListener('click', restoreFromHistory));
 });
