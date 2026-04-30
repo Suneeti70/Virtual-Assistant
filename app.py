@@ -126,8 +126,11 @@ def generate():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    # Insecure transport only for local testing
+    
+    # Check if we are running locally or on Render
     if os.getenv("FLASK_ENV") == "development":
         os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
-    
-    app.run(debug=True)
+        app.run(debug=True)
+    else:
+        # On Render, we don't call app.run() because Gunicorn handles it
+        pass
