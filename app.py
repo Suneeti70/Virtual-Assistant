@@ -125,11 +125,11 @@ def generate():
         return jsonify({'result': ai_result, 'id': new_entry.id, 'input': text, 'mode': mode})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+with app.app_context():
+        db.create_all()
 # --- STARTUP ---
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+    
     
     # Check if local development
     if os.getenv("FLASK_ENV") == "development":
