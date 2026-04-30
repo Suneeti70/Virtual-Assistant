@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from authlib.integrations.flask_client import OAuth
 from google import genai
+import google.generativeai as genai
 from dotenv import load_dotenv # Added to load your secrets
 import secrets
 
@@ -35,7 +36,7 @@ google = oauth.register(
 
 # --- GEMINI CLIENT ---
 # Pulls your API key securely
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # --- DATABASE MODELS ---
 class User(UserMixin, db.Model):
