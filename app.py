@@ -4,39 +4,40 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from authlib.integrations.flask_client import OAuth
 from google import genai
+from dotenv import load_dotenv # Added to load your secrets
 import secrets
 
-# Enable insecure transport for local development login testing
-os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
+# Load environment variables from .env file
+load_dotenv()
 
+# --- SECURITY CONFIGURATION ---
+# IMPORTANT: These will now pull from Render's Environment Variables or your local .env
 app = Flask(__name__)
-# Generated a more secure secret key
-app.secret_key = "ef00958874731ad676e5d748b8ed19637e9c8e6e0ef44bff"
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "fallback-secret-for-dev-only")
 
-# 1. Database Setup
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///MaSU.db'
+# Database Setup - Uses SQLite locally, but can be swapped for PostgreSQL on Render easily
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "sqlite:///MaSU.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# 2. Login Manager
+# --- LOGIN & OAUTH SETUP ---
 login_manager = LoginManager(app)
-login_manager.login_view = "login_page" # Redirect to login page if not authenticated
+login_manager.login_view = "login_page"
 
-# 3. Google OAuth
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
-    client_id="80861385010-ra8i7pg2jsnkrna5dm0idara02ci30ue.apps.googleusercontent.com",
-    client_secret="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",
+    client_id=os.getenv("GOOGLE_CLIENT_ID"),
+    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={'scope': 'openid email profile'}
 )
 
-# 4. Gemini Client
-client = genai.Client(api_key="AIzaSyCKuY7QlrOO6RA_4Z5fb8-wCsbigECLjL4")
+# --- GEMINI CLIENT ---
+# Pulls your API key securely
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-
-# 5. Database Models
+# --- DATABASE MODELS ---
 class User(UserMixin, db.Model):
     id = db.Column(db.String(100), primary_key=True)
     name = db.Column(db.String(100))
@@ -58,13 +59,13 @@ def load_user(user_id):
 
 @app.route('/login')
 def login_page():
-    # If already logged in, redirect to dashboard
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     return render_template('login.html')
 
 @app.route('/login/google')
 def login_google():
+    # Render automatically handles the base URL, but we ensure the callback is secure
     redirect_uri = url_for('authorize', _external=True)
     return google.authorize_redirect(redirect_uri)
 
@@ -89,7 +90,7 @@ def logout():
     return redirect(url_for('login_page'))
 
 @app.route('/')
-@login_required # Dashboard requires login
+@login_required 
 def index():
     user_history = History.query.filter_by(user_id=current_user.id).order_by(History.id.desc()).limit(10).all()
     return render_template('index.html', history=user_history)
@@ -108,17 +109,15 @@ def generate():
 
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-2.0-flash', # Updated to latest stable version
             contents=prompt
         )
         ai_result = response.text
         
-        # Save to DB
         new_entry = History(user_id=current_user.id, input_text=text, output_text=ai_result, mode=mode)
         db.session.add(new_entry)
         db.session.commit()
         
-        # Return both response and newly created ID so JS can inject it dynamically
         return jsonify({'result': ai_result, 'id': new_entry.id, 'input': text, 'mode': mode})
         
     except Exception as e:
@@ -127,5 +126,8 @@ def generate():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    # Insecure transport only for local testing
+    if os.getenv("FLASK_ENV") == "development":
+        os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
     
+    app.run(debug=True)
