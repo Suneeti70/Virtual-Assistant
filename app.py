@@ -36,7 +36,7 @@ google = oauth.register(
 
 # --- GEMINI CLIENT ---
 # Pulls your API key securely
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+client=genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # --- DATABASE MODELS ---
 class User(UserMixin, db.Model):
@@ -110,7 +110,7 @@ def generate():
 
     try:
         response = client.models.generate_content(
-            model='gemini-2.0-flash', # Updated to latest stable version
+            model='gemini-1.5-flash', # Updated to latest stable version
             contents=prompt
         )
         ai_result = response.text
