@@ -3,33 +3,27 @@ from flask import Flask, render_template, request, jsonify, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from authlib.integrations.flask_client import OAuth
-import google.generativeai as genai
-from dotenv import load_dotenv
+from google import genai
+from dotenv import load_dotenv # Added to load your secrets
+import secrets
 
-# Load local .env file if it exists
+# Load environment variables from .env file
 load_dotenv()
 
+# --- SECURITY CONFIGURATION ---
+# IMPORTANT: These will now pull from Render's Environment Variables or your local .env
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "fallback-secret-for-dev-only")
 
-# --- CONFIGURATION ---
-# Use environment variables with fallbacks for safety
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-key-123")
-
-# Render uses a dynamic database path; this handles both local and cloud
-database_url = os.getenv("DATABASE_URL", "sqlite:///MaSU.db")
-if database_url.startswith("postgres://"):
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+# Database Setup - Uses SQLite locally, but can be swapped for PostgreSQL on Render easily
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "sqlite:///MaSU.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db = SQLAlchemy(app)
 
-# --- LOGIN MANAGER ---
+# --- LOGIN & OAUTH SETUP ---
 login_manager = LoginManager(app)
 login_manager.login_view = "login_page"
 
-# --- OAUTH SETUP ---
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
@@ -39,12 +33,11 @@ google = oauth.register(
     client_kwargs={'scope': 'openid email profile'}
 )
 
-# --- GEMINI SETUP ---
-# Using the stable configuration method
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-2.0-flash')
+# --- GEMINI CLIENT ---
+# Pulls your API key securely
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-# --- MODELS ---
+# --- DATABASE MODELS ---
 class User(UserMixin, db.Model):
     id = db.Column(db.String(100), primary_key=True)
     name = db.Column(db.String(100))
@@ -72,7 +65,7 @@ def login_page():
 
 @app.route('/login/google')
 def login_google():
-    # External=True is vital for OAuth to find the correct Render URL
+    # Render automatically handles the base URL, but we ensure the callback is secure
     redirect_uri = url_for('authorize', _external=True)
     return google.authorize_redirect(redirect_uri)
 
@@ -97,7 +90,7 @@ def logout():
     return redirect(url_for('login_page'))
 
 @app.route('/')
-@login_required
+@login_required 
 def index():
     user_history = History.query.filter_by(user_id=current_user.id).order_by(History.id.desc()).limit(10).all()
     return render_template('index.html', history=user_history)
@@ -115,7 +108,10 @@ def generate():
     prompt = f"Please {mode.lower()} the following text clearly:\n\n{text}"
 
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-2.0-flash', # Updated to latest stable version
+            contents=prompt
+        )
         ai_result = response.text
         
         new_entry = History(user_id=current_user.id, input_text=text, output_text=ai_result, mode=mode)
@@ -123,19 +119,15 @@ def generate():
         db.session.commit()
         
         return jsonify({'result': ai_result, 'id': new_entry.id, 'input': text, 'mode': mode})
+        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-with app.app_context():
-        db.create_all()
-# --- STARTUP ---
+
 if __name__ == '__main__':
-    
-    
-    # Check if local development
+    with app.app_context():
+        db.create_all()
+    # Insecure transport only for local testing
     if os.getenv("FLASK_ENV") == "development":
         os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
-        app.run(debug=True)
-    else:
-        # On Render, Gunicorn handles the start; this is just a backup
-        port = int(os.environ.get("PORT", 5000))
-        app.run(host='0.0.0.0', port=port)
+    
+    app.run(debug=True)
