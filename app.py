@@ -58,6 +58,10 @@ class History(db.Model):
     output_text = db.Column(db.Text)
     mode = db.Column(db.String(50))
 
+# Create database tables when the app is imported by Gunicorn/Render too.
+with app.app_context():
+    db.create_all()
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
@@ -128,9 +132,6 @@ def generate():
 
 # --- STARTUP ---
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    
     # Check if local development
     if os.getenv("FLASK_ENV") == "development":
         os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
